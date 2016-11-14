@@ -64,17 +64,13 @@ public class InstaceStatusNovaClass implements Runnable{
 		PASSWORD              = OpenStackPASSWD;
 		PROJECT_ID            = OpenStackPROJECT;
 		END_POINT             = OpenStackENDPOINT;
-		/*this.client = OSFactory.builder().endpoint("http://103.22.221.51:5000/v2.0").credentials(USER_ID,PASSWORD).tenantName(PROJECT_ID).authenticate();*/
-		
+				
 		//Setting Regions
-		regions.put("GIST","103.22.221.170");
-		regions.put("ID","167.205.51.36");
-		regions.put("MYREN","103.26.47.228");
-		regions.put("PH","202.90.150.4");
-		regions.put("PKS","111.68.98.228");
-		//regions.put("GJ-TEST","103.22.221.31");
-		//regions.put("MY","203.80.21.4");
-		//regions.put("TH","161.200.25.99");
+		regions.put("GIST","ip");
+		regions.put("ID","ip");
+		regions.put("MYREN","ip");
+		regions.put("PH","ip");
+		regions.put("PKS","ip");
 	}
 
 	public void getOSInstanceList() {
@@ -99,8 +95,7 @@ public class InstaceStatusNovaClass implements Runnable{
 			System.out.println("**************************************");
 			//URL String to call OpentStack RestAPI
 			String urlStr = "http://"+regions.get(key)+":8774/v2/ec8174bf08414e39b0b0f0ced69955d4/servers/detail?all_tenants=1";
-			//String urlStr = "http://103.22.221.170:8774/v2/ec8174bf08414e39b0b0f0ced69955d4/servers/detail?all_tenants=1";
-		    
+			
 			try 
 		    {
 		    	//Create URL from url STRING

@@ -54,7 +54,7 @@ public class SDNControllerStatusClass implements Runnable{
 		collection2 = db.getCollection(flowConfigMongoCollectionRT);
 		
 		// Connect to InfluxDB
-        // influxDB = InfluxDBFactory.connect("http://103.22.221.55:8086", "root", "root");
+        // influxDB = InfluxDBFactory.connect("ip:8086", "user", "password");
         
         // Create a database
         // String InfluxdbName = "flow_config_visibility";
