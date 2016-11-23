@@ -167,7 +167,7 @@ public class PingStatusClass implements Runnable {
 		            	
 		            	UpdateResult result= db.getCollection(pboxMongoCollection).updateOne(new Document("management_ip", m_ip),
 		            	        new Document("$set", new Document("management_ip_status", m_status_new).append("data_ip_status", d_status)));
-		            	System.out.println("["+dateFormat.format(timestamp)+"][INFO][Box: "+m_ip+" Management Status: "+m_status_new+" Data Status: "+d_status+" Records Updated :"+result.getModifiedCount()+"]");
+		            	System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+m_ip+" Management Status: "+m_status_new+" Data Status: "+d_status+" Records Updated :"+result.getModifiedCount()+"]");
 		            }
 		        });
 		    }

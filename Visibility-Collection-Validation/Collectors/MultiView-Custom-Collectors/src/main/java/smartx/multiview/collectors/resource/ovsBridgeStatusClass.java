@@ -25,27 +25,27 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.UpdateResult;
 
 public class ovsBridgeStatusClass implements Runnable{
-	private String box = "";
-	private String m_ip = "";
-	private Boolean Mathced=false;
 	private Thread thread;
 	private String ThreadName="pBox Status Thread";
-	private static Logger logger = Logger.getLogger(PingStatusClass.class.getName());
-	private MongoClient mongoClient;
-	private MongoDatabase db;
-	private String pboxMongoCollection;
-	private String ovsListMongoCollection;
-	private String ovsstatusMongoCollection;
-	private String [] BoxType;
+	private String SmartXBox_USER, SmartXBox_PASSWORD;
+	private String box = "", m_ip = "";
+	private String pboxMongoCollection, ovsListMongoCollection, ovsstatusMongoCollection;
 	private String OVS_STATUS;
+	private String [] BoxType;
 	private List<String> bridges = new ArrayList<String>();
-	private FindIterable<Document> pBoxList;
-    private FindIterable<Document> ovsList;
+	private Boolean Mathced=false;
     private Date timestamp;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private MongoClient mongoClient;
+	private MongoDatabase db;
+	private FindIterable<Document> pBoxList;
+    private FindIterable<Document> ovsList;
+    private static Logger logger = Logger.getLogger(PingStatusClass.class.getName());
     
-    public ovsBridgeStatusClass(String dbHost, int dbPort, String dbName, String pbox, String ovslist, String ovsstatus, String [] boxType) {
-		mongoClient 			 = new MongoClient(dbHost, dbPort);
+    public ovsBridgeStatusClass(String boxUser, String boxPassword, String dbHost, int dbPort, String dbName, String pbox, String ovslist, String ovsstatus, String [] boxType) {
+    	SmartXBox_USER           = boxUser;
+    	SmartXBox_PASSWORD       = boxPassword;
+    	mongoClient 			 = new MongoClient(dbHost, dbPort);
 		db                       = mongoClient.getDatabase(dbName);
 		pboxMongoCollection      = pbox;
 		ovsListMongoCollection   = ovslist;
@@ -70,13 +70,14 @@ public class ovsBridgeStatusClass implements Runnable{
             String line = br.readLine();
             //System.out.println(command+"  - Result : "+line);
             
-        	if (Integer.parseInt(line)>0)
+        	if (Integer.parseInt(line)==0)
         	{
         		OVS_STATUS="GREEN";
             }
             else
             {
             	OVS_STATUS="ORANGE";
+            	//System.out.println("Orange");
             }
              
             //System.out.println("ExitCode: " + sess.getExitStatus());
@@ -176,7 +177,7 @@ public class ovsBridgeStatusClass implements Runnable{
 		        m_ip = (String) document.get("management_ip");
 		        
 		        //Check Status of OVS Process in each Box/OVS-VM
-		        CheckOVSProcess(m_ip,"service openvswitch-switch status | grep -c running", "root","fn!xo!ska!");
+		        CheckOVSProcess(m_ip,"service openvswitch-switch status | egrep -c 'stop|not running'", SmartXBox_USER, SmartXBox_PASSWORD);
 		        if (OVS_STATUS.equals("ORANGE"))
 		        {
 		        	UpdateResult result= db.getCollection(ovsstatusMongoCollection).updateMany(new Document("box", box),
@@ -187,7 +188,7 @@ public class ovsBridgeStatusClass implements Runnable{
 			    else
 		        {
 			    	//Check Status of OpenStack Neutron Service
-			        CheckNeutron(m_ip,"ps aux | grep -c neutron-openvswitch-agent", "root","fn!xo!ska!");
+			        CheckNeutron(m_ip,"ps aux | grep -c neutron-openvswitch-agent", SmartXBox_USER,SmartXBox_PASSWORD);
 			        if (OVS_STATUS.equals("DARKGRAY"))
 			        {
 			        	UpdateResult result= db.getCollection(ovsstatusMongoCollection).updateMany(new Document("box", box),
@@ -198,7 +199,7 @@ public class ovsBridgeStatusClass implements Runnable{
 				    else
 			        {   
 				    	//Check OVS bridge configurations for existance of bridge
-				    	SSHClient(m_ip,"ovs-vsctl list-br", "root","fn!xo!ska!");
+				    	SSHClient(m_ip,"ovs-vsctl list-br", SmartXBox_USER, SmartXBox_PASSWORD);
 				        
 				        ovsList = db.getCollection(ovsListMongoCollection).find(new Document("type", "B**"));
 		        		ovsList.forEach(new Block<Document>() 
@@ -212,7 +213,7 @@ public class ovsBridgeStatusClass implements Runnable{
 				            		{
 				            			UpdateResult result= db.getCollection(ovsstatusMongoCollection).updateOne(new Document("box", box).append("bridge", bridges.get(i)),
 				                		        new Document("$set", new Document("status", OVS_STATUS)));
-				                		System.out.println("["+dateFormat.format(timestamp)+"][INFO][Bridge : "+bridges.get(i)+" Records Updated :"+result.getModifiedCount()+"]");
+				                		System.out.println("["+dateFormat.format(timestamp)+"][INFO][OVS][Bridge : "+bridges.get(i)+" Records Updated :"+result.getModifiedCount()+"]");
 				            			Mathced=true;
 				            			//System.out.println(Mathced);
 				                		break;
@@ -225,7 +226,7 @@ public class ovsBridgeStatusClass implements Runnable{
 				            		//System.out.println("False "+ ovsDocument.get("bridge")+ " m_ip: "+m_ip+" status: "+OVS_STATUS);
 				            		UpdateResult result= db.getCollection(ovsstatusMongoCollection).updateOne(new Document("box", box).append("bridge", ovsDocument.get("bridge")),
 				    		        		        new Document("$set", new Document("status", "RED")));
-				    		        System.out.println("["+dateFormat.format(timestamp)+"][INFO][Bridge : "+ovsDocument.get("bridge")+" Records Updated :"+result.getModifiedCount()+"]");
+				    		        System.out.println("["+dateFormat.format(timestamp)+"][INFO][OVS][Bridge : "+ovsDocument.get("bridge")+" Records Updated :"+result.getModifiedCount()+"]");
 				            		Mathced=false;
 				            		//System.out.println(Mathced);
 				            	}

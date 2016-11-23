@@ -52,31 +52,12 @@ public class SDNControllerStatusClass implements Runnable{
 		db          = mongoClient.getDatabase(dbName);
 		collection1 = db.getCollection(flowConfigMongoCollection);
 		collection2 = db.getCollection(flowConfigMongoCollectionRT);
-		
-		// Connect to InfluxDB
-        // influxDB = InfluxDBFactory.connect("ip:8086", "user", "password");
-        
-        // Create a database
-        // String InfluxdbName = "flow_config_visibility";
-        // influxDB.createDatabase(InfluxdbName);
-        // Create a 'batch' of example 'points'
-        //batchPoints = BatchPoints
-        //        .database(InfluxdbName)
-        //        .tag("async", "true")
-        //        .retentionPolicy("default")
-        //        .consistency(InfluxDB.ConsistencyLevel.ALL)
-       //         .tag("BatchTag", "BatchTagValue") // tag each point in the batch
-        //        .build();
-        
 		devopscontroller          = devopscon;
 		user 					  = User;
 		password                  = Password;
 	}
      
-    {
-		// TODO Auto-generated constructor stub
-	}
-	public void getFlowsDetails() 
+    public void getFlowsDetails() 
     {
     	String baseURL   = "http://"+devopscontroller+":8080/controller/nb/v2/flowprogrammer";
     	String containerName = "default", actions, NodeID, BoxID; 
@@ -117,7 +98,7 @@ public class SDNControllerStatusClass implements Runnable{
 	        for (int i=0 ; i<jsonArray.length(); i++)
 	        {
 	        	document = new Document();
-	        	System.out.print("["+dateFormat.format(timestamp)+"][INFO][Node "+jsonArray.getJSONObject(i).get("node"));
+	        	System.out.print("["+dateFormat.format(timestamp)+"][INFO][ODL][Node "+jsonArray.getJSONObject(i).get("node"));
 	        	System.out.print(" Name "+jsonArray.getJSONObject(i).get("name"));
 	        	System.out.print(" Install In Hw "+jsonArray.getJSONObject(i).get("installInHw"));
 	        	System.out.print(" Ingress Port "+jsonArray.getJSONObject(i).get("ingressPort"));

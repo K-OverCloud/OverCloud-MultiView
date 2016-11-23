@@ -64,22 +64,27 @@ public class InstaceStatusNovaClass implements Runnable{
 		PASSWORD              = OpenStackPASSWD;
 		PROJECT_ID            = OpenStackPROJECT;
 		END_POINT             = OpenStackENDPOINT;
-				
+		/*this.client = OSFactory.builder().endpoint("http://103.22.221.51:5000/v2.0").credentials(USER_ID,PASSWORD).tenantName(PROJECT_ID).authenticate();*/
+		
 		//Setting Regions
-		regions.put("GIST","ip");
-		regions.put("ID","ip");
-		regions.put("MYREN","ip");
-		regions.put("PH","ip");
-		regions.put("PKS","ip");
+		regions.put("GIST","103.22.221.170");
+		regions.put("ID","167.205.51.36");
+		regions.put("MYREN","103.26.47.228");
+		regions.put("PH","202.90.150.4");
+		regions.put("PKS","111.68.98.228");
+		//regions.put("GJ-TEST","103.22.221.31");
+		//regions.put("MY","203.80.21.4");
+		//regions.put("TH","161.200.25.99");
 	}
 
 	public void getOSInstanceList() {
 		//Delete Previous Documents from Real Time collection
     	deleteResult=db.getCollection(vboxMongoCollectionRT).deleteMany(new Document());
-		System.out.println("["+timestamp+"][INFO][Successfully Deleted Documents: "+deleteResult.getDeletedCount()+"]");
+		//System.out.println("["+timestamp+"][INFO][Successfully Deleted Documents: "+deleteResult.getDeletedCount()+"]");
 		e = regions.keys();
 		while (e.hasMoreElements())
 		{
+			timestamp = new Date();
 			this.client = OSFactory.builder()
 	                	  .endpoint(END_POINT)
 	                	  .credentials(USER_ID,PASSWORD)
@@ -89,13 +94,15 @@ public class InstaceStatusNovaClass implements Runnable{
 			key = (String) e.nextElement();
 			//Get the Identity Token
 			token = client.getToken().getId();
-			System.out.println("**************************************");
-			System.out.println("Token : "+ token);
-			System.out.println("Region: "+ regions.get(key));
-			System.out.println("**************************************");
+			//System.out.println("**************************************");
+			System.out.println("["+dateFormat.format(timestamp)+"][INFO][NOVA][Region: "+regions.get(key)+" Token: "+token+"]");
+			//System.out.println("Token : "+ token);
+			//System.out.println("Region: "+ regions.get(key));
+			//System.out.println("**************************************");
 			//URL String to call OpentStack RestAPI
 			String urlStr = "http://"+regions.get(key)+":8774/v2/ec8174bf08414e39b0b0f0ced69955d4/servers/detail?all_tenants=1";
-			
+			//String urlStr = "http://103.22.221.170:8774/v2/ec8174bf08414e39b0b0f0ced69955d4/servers/detail?all_tenants=1";
+		    
 			try 
 		    {
 		    	//Create URL from url STRING
@@ -128,7 +135,6 @@ public class InstaceStatusNovaClass implements Runnable{
 		        	documentHistory = new Document();
 		        	documentRT      = new Document();
 		        	jsonKeyObject   = (JSONObject) jsonServersArray.get(i);
-		        	timestamp = new Date();
 		        	
 		        	documentHistory.put("timestamp", new Date());
 		        	documentHistory.put("region",key);
@@ -194,7 +200,7 @@ public class InstaceStatusNovaClass implements Runnable{
 		        	//Insert New Documents to MongoDB
 		    		db.getCollection(vboxMongoCollectionRT).insertOne(documentRT);
 	            	db.getCollection(vboxMongoCollection).insertOne(documentHistory);
-	            	System.out.println("["+dateFormat.format(timestamp)+"][INFO]["+jsonKeyObject.get("OS-EXT-SRV-ATTR:host")+" : "+jsonKeyObject.get("name")+" : "+jsonKeyObject.get("OS-EXT-STS:vm_state")+"]");
+	            	System.out.println("["+dateFormat.format(timestamp)+"][INFO][NOVA][Box: "+jsonKeyObject.get("OS-EXT-SRV-ATTR:host")+" Instance: "+jsonKeyObject.get("name")+" State: "+jsonKeyObject.get("OS-EXT-STS:vm_state")+"]");
 		    	}
 		    } catch (MalformedURLException e) {
 				// TODO Auto-generated catch block

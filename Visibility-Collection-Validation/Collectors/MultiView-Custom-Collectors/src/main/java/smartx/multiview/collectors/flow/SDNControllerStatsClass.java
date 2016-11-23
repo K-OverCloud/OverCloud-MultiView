@@ -110,7 +110,7 @@ public class SDNControllerStatsClass implements Runnable{
 			        	else
 			        		BoxID="";
 		        		
-		        		System.out.print("["+dateFormat.format(timestamp)+"][INFO][Node "+id[0].substring(7, id[0].length()-1));
+		        		System.out.print("["+dateFormat.format(timestamp)+"][INFO][ODL][Node "+id[0].substring(7, id[0].length()-1));
 		        		System.out.print(" packetCount "+jsonArrayFlowStat.getJSONObject(j).get("packetCount"));
 		        		System.out.print(" byteCount "+jsonArrayFlowStat.getJSONObject(j).get("byteCount"));
 		        		System.out.print(" durationSeconds "+jsonArrayFlowStat.getJSONObject(j).get("durationSeconds"));

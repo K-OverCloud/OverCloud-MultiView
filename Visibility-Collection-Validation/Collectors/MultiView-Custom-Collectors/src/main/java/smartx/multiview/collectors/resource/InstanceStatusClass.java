@@ -1,5 +1,7 @@
 package smartx.multiview.collectors.resource;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
@@ -13,23 +15,22 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 
 public class InstanceStatusClass implements Runnable{
-	private String box = "";
 	private Thread thread;
 	private String ThreadName="vBox Status Thread";
-	private Date date;
-	private static Logger logger = Logger.getLogger(PingStatusClass.class.getName());
-	
-	private MongoClient mongoClient;
-	private static MongoDatabase db;
-	private Document NewDocument;
-	private DeleteResult deleteResult;
-	
+	private String box = "";
 	private String pboxMongoCollection;
 	private String vboxMongoCollection;
 	private String vboxosMongoCollection;
-    
-    private FindIterable<Document> pBoxList;
+	private MongoClient mongoClient;
+	private MongoDatabase db;
+	private Document NewDocument;
+	private DeleteResult deleteResult;
+	private FindIterable<Document> pBoxList;
     private FindIterable<Document> pBoxStatus;
+    private Date date;
+    private Date timestamp;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static Logger logger = Logger.getLogger(PingStatusClass.class.getName());
     
     public InstanceStatusClass(String dbHost, int dbPort, String dbName, String pbox, String vbox, String vboxos) {
 		mongoClient           = new MongoClient(dbHost, dbPort);
@@ -40,9 +41,10 @@ public class InstanceStatusClass implements Runnable{
 	}
 	public void update_status() {
 		date = new Date();
+		timestamp = new Date();
 		pBoxList = db.getCollection(pboxMongoCollection).find();
 		deleteResult=db.getCollection(vboxMongoCollection).deleteMany(new Document());
-		System.out.println("Successfully Deleted Documents: "+deleteResult.getDeletedCount());
+		//System.out.println("Successfully Deleted Documents: "+deleteResult.getDeletedCount());
 		
 		pBoxList.forEach(new Block<Document>() {
 		    public void apply(final Document document) {
@@ -70,7 +72,7 @@ public class InstanceStatusClass implements Runnable{
 		            	}
 		            	
 		            	db.getCollection(vboxMongoCollection).insertOne(NewDocument);
-		            	System.out.println(box+" : "+InstanceDocument.get("name")+" : "+InstanceDocument.get("state"));
+		            	System.out.println("["+dateFormat.format(timestamp)+"][INFO][NOVA][Box: "+box+" Instance: "+InstanceDocument.get("name")+" State: "+InstanceDocument.get("state")+"]");
 		            }
 		        });
 		    }
