@@ -11,3 +11,11 @@ This is the first version of the tools and it still being developed/verified.
 * OpenStack Juno Stable Release
 * OpenStack VLAN-based Tenant Network
 * OpenvSwitch OpenFlow-SDN VXLAN Overlay Network and ODL
+
+### Installation ###
+Before Installation modify the follwing configuration files:
+* MultiView_Configurations/Custom_Collectors.properties
+* MultiView_Scripts/MultiView_Configuration_Database.js
+
+After Modification of above Files Execute:
+./Install.sh
