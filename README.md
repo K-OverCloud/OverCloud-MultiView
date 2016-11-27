@@ -18,4 +18,4 @@ Before Installation modify the follwing configuration files:
 * MultiView_Scripts/MultiView_Configuration_Database.js
 
 After Modification of above Files Execute:
-./Install.sh
+* ./Install.sh
