@@ -27,3 +27,4 @@ cd Visibility-Visualization/pvcT-Visualization
 npm config set registry https://registry.npmjs.org/
 npm cache clean
 npm install
+cd currentDir
