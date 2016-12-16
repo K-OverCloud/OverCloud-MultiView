@@ -3,9 +3,14 @@ use smartxdb
 show collections
 
 //Create Unique Indexes
+db['configuration-multiview-users'].createIndex( { username:1, password: 1 }, { unique: true } )
 db['configuration-pbox-list'].createIndex({box:1, boxID: 1},{unique:true})
 db['configuration-vswitch-list'].ensureIndex({type:1, bridge: 1},{unique:true})
 db['configuration-vswitch-status'].ensureIndex({bridge:1, box: 1},{unique:true})
+
+//Insert MultiView Users Data into Collection
+db['configuration-multiview-users'].insert( { username: "admin", password: "admin", role: "operator" } )
+db['configuration-multiview-users'].insert( { username: "demo", password: "demo", role: "developer" } )
 
 //Insert pBoxes Data into Collection
 db['configuration-pbox-list'].insert( { box: "SaaS-Box1", boxID: "OverCloudBox1", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.51", data_ip_status: "up", control_ip: "192.168.88.200", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "" } )
