@@ -14,8 +14,13 @@ This is the first version of the tools and it still being developed/verified.
 
 ### Installation ###
 Before Installation modify the follwing configuration files:
+* Visibility_Center_Install.sh
+* Agent_Box_Install.sh
 * MultiView_Configurations/Custom_Collectors.properties
 * MultiView_Scripts/MultiView_Configuration_Database.js
 
 After Modification of above Files Execute:
-* ./Install.sh
+* Installation on Visibility Center 
+  ./Visibility_Center_Install.sh
+* Installation on OverCloud Box
+  ./Agent_Box_Install.sh
