@@ -35,7 +35,7 @@
       var session_userrole = sessionStorage.getItem('ss_role');
       
       if(session_username === null){
-        window.location.replace("http://103.22.221.55:3006");
+        window.location.replace("http://210.125.84.69:3006");
       }
 	  
 	  //Resource-level Functions Start
@@ -43,20 +43,20 @@
       function receiveValueBox(boxs){
         var iframe = document.getElementById('grafanaIframe');
         console.log(boxs);
-        iframe.src = 'http://103.22.221.55:3000/dashboard/db/resource-dashboard-'+boxs.label;
+        iframe.src = 'http://210.125.84.69:3000/dashboard/db/resource-dashboard-'+boxs.label;
       }
       //receive brCap Objects
       function receiveValueBrCap(brCaps){
         var iframe = document.getElementById('grafanaIframe');
         console.log(brCaps);
-        ////iframe.src = 'http://103.22.221.55:3000/dashboard/db/flow-dashboard-'+brCaps.label+'-'+brCaps.box;
-        //iframe.src = 'http://103.22.221.55:3006/opsflowrules/'+brCaps.box;
+        ////iframe.src = 'http://210.125.84.69:3000/dashboard/db/flow-dashboard-'+brCaps.label+'-'+brCaps.box;
+        //iframe.src = 'http://210.125.84.69:3006/opsflowrules/'+brCaps.box;
       }
       //receive VM Objects
       function receiveValueVM(vms){
         var iframe = document.getElementById('grafanaIframe');
         console.log(vms);
-        //iframe.src = 'http://103.22.221.55:3000/dashboard/db/flow-dashboard-instance-'+vms.label+'-'+vms.box;
+        //iframe.src = 'http://210.125.84.69:3000/dashboard/db/flow-dashboard-instance-'+vms.label+'-'+vms.box;
       }
 	  //Resource-level Functions End
 	  
@@ -65,25 +65,25 @@
       function getNetworkFlow(network){
         var iframe = document.getElementById('grafanaIframe');
         //console.log(boxs);
-        iframe.src = 'http://103.22.221.55:8008/app/dashboard-example/html/';
+        iframe.src = 'http://210.125.84.69:8008/app/dashboard-example/html/';
       }
 	  //Route to Box Flow View
       function getBoxFlow(boxs){
         var iframe = document.getElementById('grafanaIframe');
         console.log(boxs);
-        //iframe.src = 'http://103.22.221.55:3000/dashboard/db/resource-dashboard-'+boxs.label;
+        //iframe.src = 'http://210.125.84.69:3000/dashboard/db/resource-dashboard-'+boxs.label;
       }
 	  //Route to Flow Rules + Stats View
       function getBrCapFlow(brCaps){
         var iframe = document.getElementById('grafanaIframe');
         console.log(brCaps);
-        iframe.src = 'http://103.22.221.55:3006/opsflowrules/'+brCaps.box;
+        iframe.src = 'http://210.125.84.69:3006/opsflowrules/'+brCaps.box;
 	  }
 	  //Route to VM View
       function getVMFlow(vms){
         var iframe = document.getElementById('grafanaIframe');
         console.log(vms);
-        //iframe.src = 'http://103.22.221.55:3006/opsflowrules/'+brCaps.box;
+        //iframe.src = 'http://210.125.84.69:3006/opsflowrules/'+brCaps.box;
 	  }
 	  //Flow-level Functions End
 	  
@@ -91,7 +91,7 @@
       function showPanel(itemID){
         var iframe = document.getElementById('topoIframe');
         console.log(itemID);
-        iframe.src = 'http://103.22.221.55:3006/'+itemID.label+'-'+itemID.box;
+        iframe.src = 'http://210.125.84.69:3006/'+itemID.label+'-'+itemID.box;
       }
       // Called when the Visualization API is loaded.
       function draw() {
@@ -104,15 +104,15 @@
 	    var iframe = document.getElementById('topoIframe');
       resource.addEventListener('click', function() { 
         document.getElementById('panel-heading-id').innerHTML = 'Resource-Centric Topological View';
-        iframe.src = 'http://103.22.221.55:3006/resourcecentricviewops';
+        iframe.src = 'http://210.125.84.69:3006/resourcecentricviewops';
         });
       flow.addEventListener('click', function() { 
         document.getElementById('panel-heading-id').innerHTML = 'Flow-Centric Topological View';
-        iframe.src = 'http://103.22.221.55:3006/flowcentricviewops';
+        iframe.src = 'http://210.125.84.69:3006/flowcentricviewops';
         });
       service.addEventListener('click', function() { 
         document.getElementById('panel-heading-id').innerHTML = 'Service-Centric Topological View';
-        iframe.src = 'http://103.22.221.55:3006/servicecentricviewops';
+        iframe.src = 'http://210.125.84.69:3006/servicecentricviewops';
         });
         //**************************************************************
       // Create a data table with nodes.
@@ -183,7 +183,7 @@
               <div class="panel-heading" id="panel-heading-id">Resource-centric Topological View</div>
               <div class="panel-body">
                 <p>
-                  <iframe id="topoIframe" src="http://103.22.221.55:3006/resourcecentricviewops" width="100%" height="60%"></iframe>
+                  <iframe id="topoIframe" src="http://210.125.84.69:3006/resourcecentricviewops" width="100%" height="60%"></iframe>
                 </p>
               </div>
             </div>

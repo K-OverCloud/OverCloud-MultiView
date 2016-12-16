@@ -13,10 +13,10 @@ db['configuration-multiview-users'].insert( { username: "admin", password: "admi
 db['configuration-multiview-users'].insert( { username: "demo", password: "demo", role: "developer" } )
 
 //Insert pBoxes Data into Collection
-db['configuration-pbox-list'].insert( { box: "SaaS-Box1", boxID: "OverCloudBox1", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.51", data_ip_status: "up", control_ip: "192.168.88.200", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "" } )
-db['configuration-pbox-list'].insert( { box: "SaaS-Box2", boxID: "OverCloudBox2", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.52", data_ip_status: "up", control_ip: "192.168.88.201", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "" } )
-db['configuration-pbox-list'].insert( { box: "SaaS-Box3", boxID: "OverCloudBox3", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.53", data_ip_status: "up", control_ip: "192.168.88.202", control_ip_status: "", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "" } )
-db['configuration-pbox-list'].insert( { box: "SaaS-Box4", boxID: "OverCloudBox4", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.54", data_ip_status: "up", control_ip: "210.125.84.203", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "" } )
+db['configuration-pbox-list'].insert( { box: "SaaS-Box1", boxID: "OverCloudBox1", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.51", data_ip_status: "up", control_ip: "192.168.88.200", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "", type: "OverCloud" } )
+db['configuration-pbox-list'].insert( { box: "SaaS-Box2", boxID: "OverCloudBox2", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.52", data_ip_status: "up", control_ip: "192.168.88.201", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "", type: "OverCloud" } )
+db['configuration-pbox-list'].insert( { box: "SaaS-Box3", boxID: "OverCloudBox3", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.53", data_ip_status: "up", control_ip: "192.168.88.202", control_ip_status: "", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "", type: "OverCloud" } )
+db['configuration-pbox-list'].insert( { box: "SaaS-Box4", boxID: "OverCloudBox4", management_ip: "", management_ip_status: "up", data_ip: "10.10.20.54", data_ip_status: "up", control_ip: "210.125.84.203", control_ip_status: "up", ovs_vm1: "", ovs_vm2: "", active_ovs_vm: "", type: "OverCloud" } )
 
 //Insert OVS Bridges Topology Data into Collection
 db['configuration-vswitch-list'].insert( { type: "OverCloud", bridge: "br-tun", topologyorder: "1" } )

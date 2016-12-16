@@ -3,20 +3,15 @@
  */
 
 var express = require('express');
-//var ArticleProvider = require('./resource-mongodb').ArticleProvider;
-//var RouteProvider = require('./route-mongodb').RouteProvider;
 var BoxProvider = require('./MultiView-DataAPI').BoxProvider;
-//var UserProvider = require('./user-mongodb').UserProvider;
 var http = require("http");
 var app = express();
-//var app = module.exports = express.createServer();
 var client = require('socket.io').listen(8080).sockets;
-// Configuration
 
+// Configuration
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-//  app.use(express.bodyParser());
   app.use(express.json());
   app.use(express.urlencoded());
   
@@ -42,23 +37,20 @@ app.get('/resourcecentricviewops', function(req, res){
     var serviceList     = 0;
     var ovsBridgeStatus = null;
     var pPathStatus     = null;
-    resourceProvider.getpBoxList( function(error,boxobj)
+    resourceProvider.getpBoxList( function(error, boxobj)
     {
-	boxList = boxobj;
-        console.log( boxList);
-	showView();
+		boxList = boxobj;
+        showView();
     })
     resourceProvider.getvSwitchList(function(error, switchobj)
     {
     	switchList = switchobj;
-        console.log(switchList);
-	showView();
+        showView();
     })
 
     resourceProvider.getvBoxList(function(error, instanceobj)
     {
         instanceList = instanceobj;
-        console.log(instanceList);
         showView();
     })
 
@@ -79,33 +71,36 @@ app.get('/resourcecentricviewops', function(req, res){
     resourceProvider.getovsBridgeStatus(function(error, bridgestatusobj)
     {
         ovsBridgeStatus = bridgestatusobj;
-        console.log(ovsBridgeStatus);
         showView();
     })
 
     function showView()
     {
         if(boxList !== null && switchList !== null && instanceList !== null && serviceList !==null &&  ovsBridgeStatus !== null)
-	{
+		{
         	console.log('Resource-Centric View Rendering');
-    		res.render('resourcecentricviewops.jade',{locals: {
-                	boxList         : JSON.stringify(boxList),
-			switchList      : JSON.stringify(switchList),
-			instanceList    : JSON.stringify(instanceList),
-			serviceList     : JSON.stringify(serviceList),
-//			pPathStatus    : JSON.stringify(pPathStatus),
-			ovsBridgeStatus : JSON.stringify(ovsBridgeStatus)
+			console.log( boxList);
+			console.log(switchList);
+			console.log(instanceList);
+			console.log(ovsBridgeStatus);
+            
+			res.render('resourcecentricviewops.jade', {boxList: JSON.stringify(boxList), switchList: JSON.stringify(switchList), instanceList: JSON.stringify(instanceList), serviceList: JSON.stringify(serviceList), ovsBridgeStatus: JSON.stringify(ovsBridgeStatus)});			
+    		/*res.render('resourcecentricviewops.jade',{locals: {
+                boxList     : JSON.stringify(boxList),
+				switchList      : JSON.stringify(switchList),
+				instanceList    : JSON.stringify(instanceList),
+				serviceList     : JSON.stringify(serviceList),
+				ovsBridgeStatus : JSON.stringify(ovsBridgeStatus)
         	},
         	title: 'Resource-Centric Topological View'}
-    		)
-	}
+    		)*/
+		}
     }
 });
 
 //var resourceProvider = new ResourceProvider();
 app.get('/flowcentricviewops', function(req, res){
     console.log('Flow-Centric View Rendering');
-    //res.render('flowcentricviewops.jade', {title: 'Flow-Centric View'})
     var boxList         = null;
     var switchList      = null;
     var instanceList    = null;
@@ -149,7 +144,6 @@ app.get('/flowcentricviewops', function(req, res){
                         switchList      : JSON.stringify(switchList),
                         instanceList    : JSON.stringify(instanceList),
                         serviceList     : JSON.stringify(serviceList),
-//                      pPathStatus    : JSON.stringify(pPathStatus),
                         ovsBridgeStatus : JSON.stringify(ovsBridgeStatus)
                 },
                 title: 'Flow-Centric Topological View'}

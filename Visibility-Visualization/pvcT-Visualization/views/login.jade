@@ -74,7 +74,7 @@ body
         var pass =$("#pass").val();
         var check =true;
         try {
-          var server = io.connect('http://103.22.221.55:8080');
+          var server = io.connect('http://210.125.84.69:8080');
         }
         catch(e) {
           alert('Sorry, we couldn\'t connect. Please try again later \n\n' + e);
@@ -96,7 +96,7 @@ body
         server.on('redirect', function(msg){
             sessionStorage.setItem('ss_user_name', name);
             sessionStorage.setItem('ss_role', msg);
-            window.location.assign('http://103.22.221.55:3006/menu');
+            window.location.assign('http://210.125.84.69:3006/menu');
         });
         }
         $(that).removeClass("success processing");

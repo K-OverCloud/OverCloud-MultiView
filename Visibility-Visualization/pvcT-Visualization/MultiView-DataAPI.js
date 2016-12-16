@@ -12,37 +12,28 @@ ResourceProvider = function() {};
 //Get MultiView Users
 ResourceProvider.prototype.getUsers = function(callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         var collection = db.collection("configuration-multiview-users");
         collection.find().toArray(function(err, users){
-
-
-		// Test for Open API Definition
-	//	var fso = enw ActiveXObject('Scripting.FileSystemObject');
-	//	var fileObj = fso.CreateTextFile("~/openapi/test.txt", true);
-	//	fileObj.WriteLine("This is the test files!!!\n");
-	//	fileObj.Close();
-
-
-                callback(null,users);
-		
-        });
+            callback(null,users);
+		});
     });
 };
 
 //Get pBoxes List From MongoDB
 ResourceProvider.prototype.getpBoxList = function(callback) 
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('Physical Boxes List: ');
-	// Locate all the entries using find
+		// Locate all the entries using find
         var collection = db.collection("configuration-pbox-list");
         //collection.find({type: 'B**'},{box: true, host: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
-	collection.find({$or:[{type: 'B**'},{type: 'C**'}]},{box: true, boxID: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
-	//	db.close();
-		callback(null,boxes);
+		//collection.find({$or:[{type: 'B**'},{type: 'C**'}]},{box: true, boxID: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
+		collection.find( { type: 'OverCloud' }, {box: true, boxID: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
+			//	db.close();
+			callback(null,boxes);
 	});
 	//console.log (db.boxes);
     });
@@ -51,13 +42,13 @@ ResourceProvider.prototype.getpBoxList = function(callback)
 //Get vSwitches List From MongoDB
 ResourceProvider.prototype.getvSwitchList = function(callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('OVS bridges List: ');
         var collection = db.collection("configuration-vswitch-list");
         collection.find({},{type: true, bridge: true, topologyorder: true, _id: false}).sort({topologyorder: 1}).toArray(function(err, switchList){
-                //db.close();
-                callback(null,switchList);
+			//db.close();
+			callback(null,switchList);
         });
     });
 };
@@ -65,7 +56,7 @@ ResourceProvider.prototype.getvSwitchList = function(callback)
 //Get OpenStack Instances List From MongoDB
 ResourceProvider.prototype.getvBoxList = function(callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('OpenStack instances List: ');
         var collection = db.collection("configuration-vbox-list");
@@ -79,7 +70,7 @@ ResourceProvider.prototype.getvBoxList = function(callback)
 //Get Services List From MongoDB
 ResourceProvider.prototype.getServicesList = function(callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('Services List: ');
         var collection = db.collection("configuration-service-list");
@@ -93,7 +84,7 @@ ResourceProvider.prototype.getServicesList = function(callback)
 //Get pPath Status From MongoDB
 /*ResourceProvider.prototype.getpPathStatus = function(callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('Physical Path Status: ');
         var collection = db.collection("configuration-pbox-path-status");
@@ -107,7 +98,7 @@ ResourceProvider.prototype.getServicesList = function(callback)
 //Get OVS Bridge Status From MongoDB
 ResourceProvider.prototype.getovsBridgeStatus = function(callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('OVS Bridge Status: ');
         var collection = db.collection("configuration-vswitch-status");
@@ -121,7 +112,7 @@ ResourceProvider.prototype.getovsBridgeStatus = function(callback)
 //Get Operator Controller Flow Rules
 ResourceProvider.prototype.getOpsSDNConfigList = function(boxID, callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
 	console.log('Flow Rules List: '+boxID);
 	var currentTime = new Date();
@@ -139,7 +130,7 @@ ResourceProvider.prototype.getOpsSDNConfigList = function(boxID, callback)
 //Get Operator Controller Flow Statistics
 ResourceProvider.prototype.getOpsSDNStatList = function(boxID, callback)
 {
-    MongoClient.connect('mongodb://127.0.0.1:27017/smartxdb', function(err, db)
+    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
     {
         console.log('Flow Statistics List: ');
         var currentTime = new Date();
