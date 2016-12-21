@@ -62,6 +62,17 @@ java_check ()
   fi
 }
 
+iostat_check ()
+{
+  if command -v iostat > /dev/null; then
+    echo -e "[$(date '+%Y-%m-%d %H:%M:%S')][INFO][INSTALL] iostat Already Installed."
+  else
+    echo -n "[$(date '+%Y-%m-%d %H:%M:%S')][INFO][INSTALL] iostat Installing .................... "
+    apt-get install -y sysstat &> /dev/null
+	echo -e "Done.\n"
+  fi
+}
+
 snap_check ()
 {
   if command -v snaptel > /dev/null; then
@@ -71,17 +82,6 @@ snap_check ()
     curl -s https://packagecloud.io/install/repositories/intelsdi-x/snap/script.deb.sh | sudo bash &> /dev/null
 	sudo apt-get install -y snap-telemetry &> /dev/null
 	systemctl start snap-telemetry &> /dev/null
-	echo -e "Done.\n"
-  fi
-}
-
-iostat_check ()
-{
-  if command -v iostat > /dev/null; then
-    echo -e "[$(date '+%Y-%m-%d %H:%M:%S')][INFO][INSTALL] iostat Already Installed."
-  else
-    echo -n "[$(date '+%Y-%m-%d %H:%M:%S')][INFO][INSTALL] iostat Installing .................... "
-    apt-get install -y sysstat &> /dev/null
 	echo -e "Done.\n"
   fi
 }

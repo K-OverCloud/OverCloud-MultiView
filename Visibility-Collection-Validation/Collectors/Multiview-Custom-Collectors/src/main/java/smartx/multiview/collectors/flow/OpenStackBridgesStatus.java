@@ -1,7 +1,5 @@
 package smartx.multiview.collectors.flow;
 
-import static java.util.Arrays.asList;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.bson.Document;
@@ -26,7 +25,8 @@ import com.mongodb.client.result.DeleteResult;
 
 public class OpenStackBridgesStatus implements Runnable{
 	private Thread thread;
-	private String ThreadName="pBox Status Thread";
+	private ReentrantLock lock = new ReentrantLock();
+	private String ThreadName="OpenStack Bridges Status Thread";
 	
 	private String SmartXBox_USER, SmartXBox_PASSWORD, box = "", m_ip = "";
 	private String pboxMongoCollection, flowMongoCollection, flowMongoCollectionRT;
@@ -76,7 +76,7 @@ public class OpenStackBridgesStatus implements Runnable{
                 if (line!=null)
                 {
                 	bridges.add(line);
-                	System.out.println(line);
+                	//System.out.println("Box: "+box+" Result:"+line);
                 	setBridgesStatus(box, serverIp, bridgeName, line);
                 }
             }
@@ -85,7 +85,7 @@ public class OpenStackBridgesStatus implements Runnable{
         }
         catch (IOException e)
         {
-        	System.out.println("[ERROR][OSB][Box : "+box+" Failed]");
+        	System.out.println("[ERROR][OpenStack Bridges][Box : "+box+" Failed]");
             e.printStackTrace(System.err);
         }
     }
@@ -104,10 +104,6 @@ public class OpenStackBridgesStatus implements Runnable{
     	dl_vlan = mappingArray[0].substring(mappingArray[0].indexOf("=")+1, mappingArray[0].length());
     	actions = mappingArray[1].substring(mappingArray[1].indexOf("=")+14, mappingArray[1].length());
     	
-    	System.out.println(ResultArray[0]);
-    	System.out.println(ResultArray[3]);
-    	System.out.println(actions);
-    	
     	document.put("timestamp", new Date());
     	document.put("box",       box);
     	document.put("bridge",    bridgeName);
@@ -119,7 +115,7 @@ public class OpenStackBridgesStatus implements Runnable{
     	//Insert New Documents to MongoDB
 		db.getCollection(flowMongoCollectionRT).insertOne(document);
     	db.getCollection(flowMongoCollection).insertOne(document);
-    	System.out.println("["+dateFormat.format(timestamp)+"][INFO][OSB][Box: "+box+" Bridge: "+bridgeName+" inserted]");
+    	System.out.println("["+dateFormat.format(timestamp)+"][INFO][OpenStack Bridges][Box: "+box+" Bridge: "+bridgeName+" inserted]");
     }
     
 	public void update_status() 
@@ -142,20 +138,25 @@ public class OpenStackBridgesStatus implements Runnable{
 		        	getBridgesStatus(box, m_ip, "brvlan","ovs-ofctl dump-flows brvlan | grep dl_vlan", SmartXBox_USER, SmartXBox_PASSWORD);
 		        	getBridgesStatus(box, m_ip, "br-int","ovs-ofctl dump-flows br-int | grep dl_vlan", SmartXBox_USER, SmartXBox_PASSWORD);
 		        }catch(StringIndexOutOfBoundsException exc){
-		        	System.out.println(exc);
-		        	throw exc;
+		        	System.out.println("["+dateFormat.format(timestamp)+"][INFO][OpenStack Bridges][Box: "+box+" Failed]"+exc);
+		        }catch(NullPointerException exc){
+		        	System.out.println("["+dateFormat.format(timestamp)+"][INFO][OpenStack Bridges][Box: "+box+" Failed]"+exc);
+		        }
+		        catch(ArrayIndexOutOfBoundsException exc){
+		        	System.out.println("["+dateFormat.format(timestamp)+"][INFO][OpenStack Bridges][Box: "+box+" Failed]"+exc);
 		        }
 		     }
-		});
+		 });
 	}
 	
 	public void run() 
 	{
 		while (true)
 		{
+			
 			update_status();
 			try {
-				//Sleep For 5 Minutes
+				//Sleep For 5 Minutes (300000)ms
 				Thread.sleep(300000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

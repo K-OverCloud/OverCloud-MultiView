@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "schedule": {
+    "type": "simple",
+    "interval": "30s"
+  },
+  "max-failures": 10,
+  "workflow": {
+    "collect": {
+      "metrics": {
+        "/intel/procfs/cpu/*/utilization_percentage": {},
+        "/intel/procfs/cpu/all/utilization_percentage": {},
+        "/intel/procfs/filesystem/rootfs/space_free": {},
+        "/intel/procfs/filesystem/rootfs/space_reserved": {},
+        "/intel/procfs/filesystem/rootfs/space_used": {},
+        "/intel/procfs/filesystem/rootfs/space_percent_free": {},
+        "/intel/procfs/filesystem/rootfs/space_percent_reserved": {},
+        "/intel/procfs/filesystem/rootfs/space_percent_used": {},
+        "/intel/procfs/filesystem/rootfs/inodes_free": {},
+        "/intel/procfs/filesystem/rootfs/inodes_reserved": {},
+        "/intel/procfs/filesystem/rootfs/inodes_used": {},
+        "/intel/procfs/filesystem/rootfs/inodes_percent_free": {},
+        "/intel/procfs/filesystem/rootfs/inodes_percent_reserved": {},
+        "/intel/procfs/filesystem/rootfs/inodes_percent_used": {},
+        "/intel/procfs/filesystem/rootfs/device_name": {},
+        "/intel/procfs/filesystem/rootfs/device_type": {},
+        "/intel/linux/iostat/avg-cpu/%user": {},
+        "/intel/linux/iostat/avg-cpu/%nice": {},
+        "/intel/linux/iostat/avg-cpu/%system": {},
+        "/intel/linux/iostat/avg-cpu/%iowait": {},
+        "/intel/linux/iostat/avg-cpu/%steal": {},
+        "/intel/linux/iostat/avg-cpu/%idle": {},
+        "/intel/linux/iostat/device/*/rrqm_per_sec": {},
+        "/intel/linux/iostat/device/*/wrqm_per_sec": {},
+        "/intel/linux/iostat/device/*/r_per_sec": {},
+        "/intel/linux/iostat/device/*/w_per_sec": {},
+        "/intel/linux/iostat/device/*/rkB_per_sec": {},
+        "/intel/linux/iostat/device/*/wkB_per_sec": {},
+        "/intel/linux/iostat/device/*/avgrq-sz": {},
+        "/intel/linux/iostat/device/*/avgqu-sz": {},
+        "/intel/linux/iostat/device/*/await": {},
+        "/intel/linux/iostat/device/*/r_await": {},
+        "/intel/linux/iostat/device/*/w_await": {},
+        "/intel/linux/iostat/device/*/svctm": {},
+        "/intel/linux/iostat/device/*/%util": {},
+        "/intel/procfs/meminfo/mem_free": {},
+        "/intel/procfs/meminfo/mem_available": {},
+        "/intel/procfs/meminfo/mem_total": {},
+        "/intel/procfs/meminfo/mem_used": {},
+        "/intel/psutil/load/load1": {},
+        "/intel/psutil/load/load5": {},
+        "/intel/psutil/load/load15": {},
+	"/intel/procfs/processes/running": {},
+        "/intel/procfs/processes/sleeping": {},
+	"/intel/procfs/processes/waiting": {},
+	"/intel/procfs/processes/zombie": {},
+	"/intel/procfs/processes/stopped": {},
+	"/intel/procfs/processes/tracing": {},
+	"/intel/procfs/processes/dead": {},
+	"/intel/procfs/processes/wakekill": {},
+	"/intel/procfs/processes/waking": {},
+	"/intel/procfs/processes/parked": {},
+	"/intel/utmp/users/logged":{},
+	"/intel/utmp/users/logged_min":{},
+	"/intel/utmp/users/logged_max":{},
+	"/intel/utmp/users/logged_avg":{},
+	"/intel/procfs/iface/eth0/bytes_recv": {},
+        "/intel/procfs/iface/eth0/bytes_sent": {},
+        "/intel/procfs/iface/eth0/packets_recv": {},
+        "/intel/procfs/iface/eth0/packets_sent": {},
+        "/intel/procfs/iface/eth1/bytes_recv": {},
+        "/intel/procfs/iface/eth1/bytes_sent": {},
+        "/intel/procfs/iface/eth1/packets_recv": {},
+        "/intel/procfs/iface/eth1/packets_sent": {},
+        "/intel/procfs/iface/eth2/bytes_recv": {},
+        "/intel/procfs/iface/eth2/bytes_sent": {},
+        "/intel/procfs/iface/eth2/packets_recv": {},
+        "/intel/procfs/iface/eth2/packets_sent": {}
+      },
+      "process": [
+        {
+          "plugin_name": "tag",
+          "config": {
+            "tags": "BoxID:SmartXBoxGIST"
+          },
+          "process": null,
+          "publish": [
+            {
+              "plugin_name": "kafka",
+              "config": {
+                "topic": "snap-pbox-visibility",
+                "brokers": "127.0.0.1:9092"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

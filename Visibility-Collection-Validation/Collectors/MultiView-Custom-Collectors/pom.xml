@@ -27,11 +27,10 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongo-java-driver</artifactId>
-      <version>3.0.3</version>
-      <scope>compile</scope>
-    </dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>mongo-java-driver</artifactId>
+    <version>3.1.0</version>
+	</dependency>
     <dependency>
 		 <groupId>com.googlecode.json-simple</groupId>
 		 <artifactId>json-simple</artifactId>
@@ -63,10 +62,17 @@
 	    <version>2.2</version>
 	</dependency>
 	<dependency>
-      <groupId>org.pacesys</groupId>
-      <artifactId>openstack4j</artifactId>
-      <version>2.0.5</version>
-    </dependency>
+    	<groupId>org.pacesys</groupId>
+    	<artifactId>openstack4j-core</artifactId>
+    	<version>3.0.3</version>
+    	<classifier>withdeps</classifier>
+	</dependency>
+	<dependency>
+    	<groupId>org.pacesys.openstack4j.connectors</groupId>
+    	<artifactId>openstack4j-httpclient</artifactId>
+    	<version>3.0.3</version>
+	</dependency>
+	
     <dependency>
 		<groupId>org.apache.httpcomponents</groupId>
 		<artifactId>httpclient</artifactId>

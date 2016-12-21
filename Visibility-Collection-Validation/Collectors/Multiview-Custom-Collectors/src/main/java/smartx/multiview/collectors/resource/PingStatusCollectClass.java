@@ -10,11 +10,10 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.bson.Document;
 
-import com.mongodb.BasicDBObject;
+import smartx.multiview.DataLake.MongoDB_Connector;
+
 import com.mongodb.Block;
-import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 
 public class PingStatusCollectClass implements Runnable
@@ -23,21 +22,21 @@ public class PingStatusCollectClass implements Runnable
 	private String ThreadName="Physical Path Thread";
 	private String VisibilityCenter, BoxIP, pingResult = "";
 	private String pboxMongoCollection, pboxstatusMongoCollection, pboxstatusMongoCollectionRT;
+	
+	private Document NewDocument;
+	private DeleteResult deleteResult;
+	private MongoDB_Connector mongoConnector;
+	private FindIterable<Document> pBoxList;
+	
 	private Date timestamp;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private MongoClient mongoClient;
-	private MongoDatabase db;
-	private Document NewDocument;
-	private BasicDBObject document;
-	private DeleteResult deleteResult;
-	private FindIterable<Document> pBoxList;
+    
 	private static Logger logger = Logger.getLogger(PingStatusCollectClass.class.getName());
 	
-	public PingStatusCollectClass(String visibilityCenter, String dbHost, int dbPort, String dbName, String pbox, String pboxstatus, String pboxstatusRT, String [] boxType) 
+	public PingStatusCollectClass(String visibilityCenter, MongoDB_Connector MongoConn, String pbox, String pboxstatus, String pboxstatusRT, String [] boxType) 
 	{
 		VisibilityCenter            = visibilityCenter;
-		mongoClient 		        = new MongoClient(dbHost, dbPort);
-		db                          = mongoClient.getDatabase(dbName);
+		mongoConnector              = MongoConn;
 		pboxMongoCollection         = pbox;
 		pboxstatusMongoCollection   = pboxstatus;
 		pboxstatusMongoCollectionRT = pboxstatusRT;
@@ -51,56 +50,58 @@ public class PingStatusCollectClass implements Runnable
 		NewDocument.put("destination", dest);
 		NewDocument.put("status", stat);
 		
-		db.getCollection(pboxstatusMongoCollection).insertOne(NewDocument);
-		db.getCollection(pboxstatusMongoCollectionRT).insertOne(NewDocument);
+		mongoConnector.insertDataDB(pboxstatusMongoCollection, NewDocument);
+		mongoConnector.insertDataDB(pboxstatusMongoCollectionRT, NewDocument);
 	}
 	
+	public void getPingStatus()
+	{
+		//Remove Previous records from Collection (For good performance)
+		deleteResult = mongoConnector.deleteDataDB(pboxstatusMongoCollectionRT);
+		
+		//Get List of SmartX Boxes
+		pBoxList = mongoConnector.getDataDB(pboxMongoCollection);
+		
+		pBoxList.forEach(new Block<Document>() {
+		    public void apply(final Document document) {
+		    	pingResult = "";
+		    	BoxIP = (String) document.get("management_ip");
+		    	
+		    	String pingCmd = "nmap -sP -R " + BoxIP;
+	            try 
+	            {
+					Runtime r = Runtime.getRuntime();
+					Process p = r.exec(pingCmd);
+	
+					BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+					String inputLine;
+					timestamp = new Date();
+					while ((inputLine = in.readLine()) != null) {
+						pingResult += inputLine;
+					}
+					
+					if (pingResult.contains("Host seems down")==true)
+					{
+						writeDB("", new Date(),VisibilityCenter, BoxIP, "Down");
+						System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+BoxIP+" Management Status: Down]");
+					}
+					else
+					{
+						writeDB("", new Date(),VisibilityCenter,BoxIP,"Up");
+						System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+BoxIP+" Management Status: Up]");
+					}
+					in.close();
+	            } catch (IOException e) {
+	            	System.out.println("[INFO][PING][Box : "+BoxIP+" Failed "+e);
+	            }
+	        }
+		});
+	}
 	public void run() 
 	{
 		while (true)
 		{
-			//Remove Previous records from Collection (For good performance)
-			deleteResult = db.getCollection(pboxstatusMongoCollectionRT).deleteMany(new Document());
-			//System.out.println("Successfully Deleted Documents: "+deleteResult.getDeletedCount());
-			
-			//Get List of SmartX Boxes
-			pBoxList = db.getCollection(pboxMongoCollection).find();
-			
-			pBoxList.forEach(new Block<Document>() {
-			    public void apply(final Document document) {
-			    	pingResult = "";
-			    	BoxIP = (String) document.get("management_ip");
-			    	
-			    	String pingCmd = "nmap -sP -R " + BoxIP;
-		            try 
-		            {
-						Runtime r = Runtime.getRuntime();
-						Process p = r.exec(pingCmd);
-		
-						BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-						String inputLine;
-						timestamp = new Date();
-						while ((inputLine = in.readLine()) != null) {
-							pingResult += inputLine;
-						}
-						
-						if (pingResult.contains("Host seems down")==true)
-						{
-							writeDB("", new Date(),VisibilityCenter,BoxIP,"Down");
-							System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+BoxIP+" Management Status: Down]");
-						}
-						else
-						{
-							writeDB("", new Date(),VisibilityCenter,BoxIP,"Up");
-							System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+BoxIP+" Management Status: Up]");
-						}
-						in.close();
-		            } catch (IOException e) {
-		            	System.out.println("[INFO][PING][Box : "+BoxIP+" Failed "+e);
-		            }
-		        }
-			});
-			
+			getPingStatus();
 			try {
 				//Sleep For 5 Minutes
 				Thread.sleep(300000);
@@ -108,6 +109,8 @@ public class PingStatusCollectClass implements Runnable
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+				
+				
 		}
 	}
 	public void start() {
