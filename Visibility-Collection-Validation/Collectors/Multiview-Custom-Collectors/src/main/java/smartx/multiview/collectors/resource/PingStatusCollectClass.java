@@ -28,6 +28,8 @@ public class PingStatusCollectClass implements Runnable
 	private MongoDB_Connector mongoConnector;
 	private FindIterable<Document> pBoxList;
 	
+	private float latency;
+	
 	private Date timestamp;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
@@ -42,13 +44,14 @@ public class PingStatusCollectClass implements Runnable
 		pboxstatusMongoCollectionRT = pboxstatusRT;
 	}
 	
-	public void writeDB(String json1, Date timestamp, String src, String dest, String stat)
+	public void writeDB(String json1, Date timestamp, String src, String dest, String stat, float latency)
 	{
 		NewDocument = new Document();
 		NewDocument.put("timestamp", new Date());
 		NewDocument.put("source", src);
 		NewDocument.put("destination", dest);
 		NewDocument.put("status", stat);
+		NewDocument.put("latency", latency);
 		
 		mongoConnector.insertDataDB(pboxstatusMongoCollection, NewDocument);
 		mongoConnector.insertDataDB(pboxstatusMongoCollectionRT, NewDocument);
@@ -76,18 +79,20 @@ public class PingStatusCollectClass implements Runnable
 					BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					String inputLine;
 					timestamp = new Date();
+					
 					while ((inputLine = in.readLine()) != null) {
 						pingResult += inputLine;
 					}
 					
 					if (pingResult.contains("Host seems down")==true)
 					{
-						writeDB("", new Date(),VisibilityCenter, BoxIP, "Down");
+						writeDB("", new Date(),VisibilityCenter, BoxIP, "Down", 0);
 						System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+BoxIP+" Management Status: Down]");
 					}
 					else
 					{
-						writeDB("", new Date(),VisibilityCenter,BoxIP,"Up");
+						latency = Float.parseFloat(pingResult.substring(pingResult.indexOf("Host is up (")+12, pingResult.indexOf(" latency")-1));
+						writeDB("", new Date(), VisibilityCenter, BoxIP, "Up", latency);
 						System.out.println("["+dateFormat.format(timestamp)+"][INFO][PING][Box: "+BoxIP+" Management Status: Up]");
 					}
 					in.close();
