@@ -5,6 +5,7 @@ var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 var dateFormat  = require('dateformat');
+var mongourl = "mongodb://103.22.221.56:27017/overclouddb";
 
 ResourceProvider = function() {};
 //UserProvider = function() {};
@@ -12,7 +13,7 @@ ResourceProvider = function() {};
 //Get MultiView Users
 ResourceProvider.prototype.getUsers = function(callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         var collection = db.collection("configuration-multiview-users");
         collection.find().toArray(function(err, users){
@@ -21,17 +22,30 @@ ResourceProvider.prototype.getUsers = function(callback)
     });
 };
 
+//Get Controllers List From MongoDB New
+ResourceProvider.prototype.getControllerList = function(callback) 
+{
+	MongoClient.connect(mongourl, function(err, db)
+    {
+        var collection = db.collection("playground-controllers-list");
+        collection.find({},{controllerIP: true, controllerName: true, controllerStatus: true, controllerSoftware: true, _id: false}).sort({controllerName: -1}).toArray(function(err, controllers){
+	     	callback(null, controllers);
+		    db.close();
+		});
+	 });
+};
+
 //Get pBoxes List From MongoDB
 ResourceProvider.prototype.getpBoxList = function(callback) 
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         console.log('Physical Boxes List: ');
 		// Locate all the entries using find
         var collection = db.collection("configuration-pbox-list");
         //collection.find({type: 'B**'},{box: true, host: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
 		//collection.find({$or:[{type: 'B**'},{type: 'C**'}]},{box: true, boxID: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
-		collection.find( { type: 'OverCloud' }, {box: true, boxID: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
+		collection.find( {}, {box: true, boxID: true, management_ip: true, management_ip_status: true, data_ip: true, data_ip_status: true, control_ip: true, control_ip_status: true, _id: false}).sort({host: -1}).toArray(function(err, boxes){
 			//	db.close();
 			callback(null,boxes);
 	});
@@ -42,7 +56,7 @@ ResourceProvider.prototype.getpBoxList = function(callback)
 //Get vSwitches List From MongoDB
 ResourceProvider.prototype.getvSwitchList = function(callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         console.log('OVS bridges List: ');
         var collection = db.collection("configuration-vswitch-list");
@@ -56,7 +70,7 @@ ResourceProvider.prototype.getvSwitchList = function(callback)
 //Get OpenStack Instances List From MongoDB
 ResourceProvider.prototype.getvBoxList = function(callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         console.log('OpenStack instances List: ');
         var collection = db.collection("configuration-vbox-list");
@@ -70,7 +84,7 @@ ResourceProvider.prototype.getvBoxList = function(callback)
 //Get Services List From MongoDB
 ResourceProvider.prototype.getServicesList = function(callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         console.log('Services List: ');
         var collection = db.collection("configuration-service-list");
@@ -98,11 +112,11 @@ ResourceProvider.prototype.getServicesList = function(callback)
 //Get OVS Bridge Status From MongoDB
 ResourceProvider.prototype.getovsBridgeStatus = function(callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         console.log('OVS Bridge Status: ');
         var collection = db.collection("configuration-vswitch-status");
-        collection.find({},{box: true, bridge: true, status: true, _id: false}).sort({box: -1}).toArray(function(err, ovsBridgeStatus){
+        collection.find({},{boxID: true, bridge: true, status: true, _id: false}).sort({boxID: -1}).toArray(function(err, ovsBridgeStatus){
                 //db.close();
                 callback(null,ovsBridgeStatus);
         });
@@ -112,7 +126,7 @@ ResourceProvider.prototype.getovsBridgeStatus = function(callback)
 //Get Operator Controller Flow Rules
 ResourceProvider.prototype.getOpsSDNConfigList = function(boxID, callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
 	console.log('Flow Rules List: '+boxID);
 	var currentTime = new Date();
@@ -130,7 +144,7 @@ ResourceProvider.prototype.getOpsSDNConfigList = function(boxID, callback)
 //Get Operator Controller Flow Statistics
 ResourceProvider.prototype.getOpsSDNStatList = function(boxID, callback)
 {
-    MongoClient.connect('mongodb://210.125.84.69:27017/smartxdb', function(err, db)
+    MongoClient.connect(mongourl, function(err, db)
     {
         console.log('Flow Statistics List: ');
         var currentTime = new Date();
@@ -142,6 +156,131 @@ ResourceProvider.prototype.getOpsSDNStatList = function(boxID, callback)
             //db.close();
             callback(null,statList);
         });
+    });
+};
+
+ResourceProvider.prototype.getDataMultiSliceVisibility = function(userID, callback)
+{
+    MongoClient.connect(mongourl, function(err, client){
+		//const db = client.db('overclouddb');
+
+		var colUnderlay_main = client.collection('underlay_main');
+		var playground_sites = client.collection('playground_sites');
+		var colpBox = client.collection('pbox-list');
+		var flowvisor_slice = client.collection('flowvisor_slice');
+		var colVMInstance = client.collection('vm-instance-list');
+		
+		var data = [];
+		var main = 0;
+		
+		colUnderlay_main.find({}).toArray(function(err, rUnderlay_main){
+			//colunder_int.find({}).toArray(function(err, rUnder_int){
+				//colunder_ren.find({}).toArray(function(err, rUnder_ren){
+					playground_sites.find({}).toArray(function(err, rplayground_sites){
+						colpBox.find({}).toArray(function(err, rpBox){
+							flowvisor_slice.find({}).toArray(function(err, rVLANs){
+								colVMInstance.find({}).toArray(function(err, rVM){
+									//colIoTHostList.find({}).toArray(function(err, rIoT){
+										//KREONET Main
+										for (var i = 0 ; i < rUnderlay_main.length; i++){
+											rUnderlay_main[i].drilldown = [];
+											rUnderlay_main[i].resource = 4;
+											rUnderlay_main[i].label = rUnderlay_main[i].name;
+											rUnderlay_main[i].info = rUnderlay_main[i].name;
+											rUnderlay_main[i].color = 'white';
+											rUnderlay_main[i].textBoder= 'LightGrey';
+											
+											//Playground sites
+											for (var l = 0 ; l < rplayground_sites.length; l++){
+												if (rplayground_sites[l].mainID == rUnderlay_main[i].mainID)
+												{
+													rplayground_sites[l].drilldown = [];
+													rplayground_sites[l].resource = 6;
+													rplayground_sites[l].label =   rplayground_sites[l].name;
+													rplayground_sites[l].info = "Site Info \n Name: " + rplayground_sites[l].name;
+													rplayground_sites[l].color = 'white';
+													rplayground_sites[l].colorBoder =  	'#9fdf9f';
+													
+													rUnderlay_main[i].drilldown.push(rplayground_sites[l]);
+													
+													//Physical Boxes
+													for (var m = 0 ; m < rpBox.length; m++){
+														if (rpBox[m].site == rplayground_sites[l].siteID)
+														{
+															rpBox[m].drilldown = [];
+															rpBox[m].resource = 1;
+															rpBox[m].label = ''+ rpBox[m].box;
+															rpBox[m].info = "Box Info \n Box Name: "+rpBox[m].boxID+ "\n"+" Site: " + rpBox[m].site;
+															if (rpBox[m].data_ip_status == "GREEN"){
+																rpBox[m].color = 'white';
+																//console.log(rpBox[m].boxName+ " "+rpBox[m].data_ip_status);
+															}
+															else{
+																rpBox[m].color = '#ffffb3';//rpBox[m].data_ip_status; light yellow
+															}
+															rpBox[m].colorBoder = 	'#53c653' //MediumSeaGreen
+															
+															rplayground_sites[l].drilldown.push(rpBox[m]);
+															
+															//Tenant VLAN IDs
+															for (var n = 0 ; n < rVLANs.length; n++){
+																if (rVLANs[n].boxID == rpBox[m].boxID)
+																{
+																	rVLANs[n].drilldown = [];
+																	rVLANs[n].resource = 7;
+																	rVLANs[n].label = ''+rVLANs[n].VLANID;
+																	rVLANs[n].info= "VLAN: " +rVLANs[n].VLANID+ "\n" + " Box: " + rVLANs[n].boxID;
+																	rVLANs[n].color = 'white';
+																	rVLANs[n].colorBoder = '#ffffb3'; //Navajo white
+																	rpBox[m].drilldown.push(rVLANs[n]);
+																	
+																	//OpenStack VMs
+																	for (var o = 0 ; o < rVM.length; o++){
+																		console.log(rVM[o].boxName+ " "+rVM[o].state);
+																		if (rVM[o].box == rVLANs[n].boxID)
+																		{
+																			rVM[o].drilldown = [];
+																			rVM[o].resource = 3;
+																			rVM[o].label = ''+rVM[o].name;
+																			rVM[o].info = "VM info \n Name: " +rVM[i].name + " - Box: " + rVM[i].boxID;
+																			rVM[o].colorBoder = '#ffff1a'; //Gold
+																			
+																			if (rVM[o].state == "Running"){
+																				rVM[o].color = 'white';
+																			//	console.log(rVM[o].box+ " "+rVM[o].state);
+																			}
+																			else{
+																				rVM[o].color = "#ffcce0"; //light red
+																			}
+																			rVLANs[n].drilldown.push(rVM[o]);
+																			
+																			var sFlows = {"resource": "11", "label": "SF", "info": "Click to get details about sampled flows", "color": "white", "colorBoder": "#80b3ff"}; //Blue
+																			rVM[o].drilldown.push(sFlows);
+																			
+																			sFlows.drilldown = [];
+																			//var tPackets = {"resource": "12", "label": "TP", "info": "Click to get details about packets", "color": "white", "colorBoder": "#0040ff"}; //Blue
+																			//sFlows.drilldown.push(tPackets);
+																		}
+																	}
+																	
+																}
+															}
+														}
+													}
+												}
+											}
+											data = rUnderlay_main;
+											//console.log(data);
+										}
+										callback(null, data);
+									});
+								});
+							});
+						});
+					});
+				//});
+			//});
+		//});
     });
 };
 

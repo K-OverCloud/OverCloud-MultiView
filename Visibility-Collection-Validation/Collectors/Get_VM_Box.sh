@@ -17,13 +17,12 @@
 # Description   : Script for Getting VM's/Box
 #
 # Created by    : usman@smartx.kr
-# Version       : 0.1
-# Last Update   : December, 2016
+# Version       : 0.2
+# Last Update   : October, 2018
 
 #Source the Admin File
-. /home/netcs/overcloud-provisioning/deployment/admin-openrc.sh
+. /home/netcs/box-openstack-installation/queens/admin-openrc.sh
 
-nova list --host SaaS-Box1 --all > SaaSBox1VMs.list
-nova list --host SaaS-Box2 --all > SaaSBox2VMs.list
-nova list --host SaaS-Box3 --all > SaaSBox3VMs.list
-nova list --host SaaS-Box4 --all > SaaSBox4VMs.list
+openstack server list --all-projects -c ID -c Name -c Status -c Host --long -f value  > SaaSVMs.list
+
+

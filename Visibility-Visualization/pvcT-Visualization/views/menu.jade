@@ -29,18 +29,34 @@ html(lang='en')
     script(type='text/javascript', src='javascripts/boxes.json')
     link(href='stylesheets/vis.css', rel='stylesheet', type='text/css')
     script(type='text/javascript').
+      var serverIP="210.125.84.69";
+      var serverPort="3006";
       //redirect to login page if user is not logged
       var session_username = sessionStorage.getItem('ss_user_name');
       var session_userrole = sessionStorage.getItem('ss_role');
       if(session_username === null){
-      window.location.replace("http://210.125.84.69:3006");
+      window.location.replace("http://"+serverIP+":"+serverPort+"/login");
       }
       //Resource-level Functions Start
       //receive Box objects
       function receiveValueBox(boxs){
       var iframe = document.getElementById('grafanaIframe');
-      console.log(boxs);
-      iframe.src = 'http://210.125.84.69:3000/dashboard/db/resource-dashboard-'+boxs.label;
+      if (boxs.label == 'SaaS-Box1')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/NM5hqr0mk/resource-dashboard-'+boxs.label+'?refresh=10s&orgId=1';
+      }
+      else if (boxs.label == 'SaaS-Box2')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/s7Orw3Aik/resource-dashboard-saas-box2?refresh=10s&orgId=1&theme=light';
+      }
+      else if (boxs.label == 'SaaS-Box3')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/LdCrQq0iz/resource-dashboard-saas-box3?refresh=10s&orgId=1&theme=light';
+      }
+      else if (boxs.label == 'SaaS-Box4')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/f2KCQ3Aik/resource-dashboard-saas-box4?refresh=10s&orgId=1&theme=light';
+      }
       }
       //receive brCap Objects
       function receiveValueBrCap(brCaps){
@@ -82,6 +98,37 @@ html(lang='en')
       //iframe.src = 'http://210.125.84.69:3006/opsflowrules/'+brCaps.box;
       }
       //Flow-level Functions End
+      //Route to Onion-ring Multi-View for tenant
+      function getOnionRingTenant(vlan){
+      var iframe = document.getElementById('topoIframe');
+      iframe.src = 'http://210.125.84.69:3006/onionringviewtenant/'+vlan;
+      }
+      //receive objects from psd3
+      function receiveTenantID(data){
+      //- console.log("Receive Data Success " + data.info);
+      var iframe = document.getElementById('grafanaIframe');
+      //iframe.src = 'http://http://210.125.84.69:3006/dashboard/db/resource-dashboard-'+data.boxID;
+      if (data.label == 'SaaS-Box1')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/NM5hqr0mk/resource-dashboard-'+data.label+'?refresh=10s&orgId=1&theme=light';
+      }
+      else if (data.label == 'SaaS-Box2')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/s7Orw3Aik/resource-dashboard-saas-box2?refresh=10s&orgId=1&theme=light';
+      }
+      else if (data.label == 'SaaS-Box3')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/LdCrQq0iz/resource-dashboard-saas-box3?refresh=10s&orgId=1&theme=light';
+      }
+      else if (data.label == 'SaaS-Box4')
+      {
+      iframe.src = 'http://210.125.84.69:3000/d/f2KCQ3Aik/resource-dashboard-saas-box4?refresh=10s&orgId=1&theme=light';
+      }
+      else if (data.label == 'SF')
+      {
+      iframe.src = 'http://210.125.84.69:8008/app/dashboard-example/html/';
+      }
+      }
       //Show Panel on Click
       function showPanel(itemID){
       var iframe = document.getElementById('topoIframe');
@@ -90,117 +137,90 @@ html(lang='en')
       }
       // Called when the Visualization API is loaded.
       function draw() {
-      document.getElementById('text').innerHTML="Logged as "+session_userrole;
+      document.getElementById('usertext').innerHTML="Logged In User:  "+session_username;
       //Update********************************************************
       var resource = document.getElementById('resourcecentricviewops');
       var flow = document.getElementById('flowcentricviewops');
       var service = document.getElementById('servicecentricviewops');
       var iframe = document.getElementById('topoIframe');
+      /*resourcecentricviewops.addEventListener('click', function() {
+      document.getElementById('panel-heading-id').innerHTML = '<b><p style="display:inline;font-size:12;color:#e6eeff;text-align:center;">Onion-ring-based Visualization (Operator)</p></b>';
+      iframe1.src = 'http://210.125.84.69:3006/onionringviewops';
+      });*/
       resource.addEventListener('click', function() {
-      document.getElementById('panel-heading-id').innerHTML = 'Resource-Centric Topological View';
-      iframe.src = 'http://210.125.84.69:3006/resourcecentricviewops';
+      document.getElementById('panel-heading-id').innerHTML = '<b><p style="display:inline;font-size:12;color:#e6eeff;text-align:center;">Onion-ring-based Visualization (Operator)</p></b>';
+      iframe.src = 'http://210.125.84.69:3006/onionringviewops';
       });
       flow.addEventListener('click', function() {
       document.getElementById('panel-heading-id').innerHTML = 'Flow-Centric Topological View';
-      iframe.src = 'http://210.125.84.69:3006/flowcentricviewops';
+      //iframe.src = 'http://210.125.84.69:3006/flowcentricviewops';
       });
       service.addEventListener('click', function() {
       document.getElementById('panel-heading-id').innerHTML = 'Service-Centric Topological View';
-      iframe.src = 'http://210.125.84.69:3006/servicecentricviewops';
+      //iframe.src = 'http://210.125.84.69:3006/servicecentricviewops';
       });
       //**************************************************************
       // Create a data table with nodes.
       }
   body(onload='draw()')
-    #wrapper
+    #wrapper(style='width: 1430px;')
       // Navigation
       nav.navbar.navbar-default.navbar-static-top(role='navigation', style='margin-bottom: 0')
-        .navbar-header
+        .navbar-header(style='background-color:#e0e0d1;width: 1460px; height: 50px; display:inline-block')
           button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
             span.sr-only Toggle navigation
             span.icon-bar
             span.icon-bar
             span.icon-bar
           p
-            #text
-        ul.nav.navbar-top-links.navbar-right
-          li.dropdown
-            a.dropdown-toggle(data-toggle='dropdown', href='#')
-              i.fa.fa-envelope.fa-fw
-              i.fa.fa-caret-down
-            ul.dropdown-menu.dropdown-messages
-          li.dropdown
-            a.dropdown-toggle(data-toggle='dropdown', href='#')
-              i.fa.fa-tasks.fa-fw
-              i.fa.fa-caret-down
-            ul.dropdown-menu.dropdown-tasks
-          li.dropdown
-            a.dropdown-toggle(data-toggle='dropdown', href='#')
-              i.fa.fa-bell.fa-fw
-              i.fa.fa-caret-down
-            ul.dropdown-menu.dropdown-alerts
-          li.dropdown
-            a.dropdown-toggle(data-toggle='dropdown', href='#')
-              i.fa.fa-user.fa-fw
-              i.fa.fa-caret-down
-            ul.dropdown-menu.dropdown-user
-              li
-                a(href='#')
-                  i.fa.fa-user.fa-fw
-                  |  User Profile
-              li
-                a(href='#')
-                  i.fa.fa-gear.fa-fw
-                  |  Settings
-              li.divider
-              li
-                a(href='login')
-                  i.fa.fa-sign-out.fa-fw
-                  |  Logout
+          #titlediv
+            b
+              h1(style='color:#ff8000;font-family:verdana;text-align:center;display:inline;') SmartX Multi-View Dashboard
+          p
         .navbar-default.sidebar(role='navigation')
           .sidebar-nav.navbar-collapse
             ul#side-menu.nav
-              li.sidebar-search
-                .input-group.custom-search-form
-                  input.form-control(type='text', placeholder='Search...')
-                  span.input-group-btn
-                    button.btn.btn-default(type='button')
-                      i.fa.fa-search
+              li.sidebar-search(style='background-color:#e0e0d1;font-size:12;color:#737373;text-align:center;width: 250px; height: 40px;')
+                #usertext.input-group.custom-search-form
               li
-                a(href='#')
+                a(href='#', style='background-color:#eaeae1;color:#3c3c2a;')
                   i.fa.fa-bookmark.fa-fw
-                  |  Multiview
+                  | SmartX Multi-View
                   span.fa.arrow
-                ul#parent-list.nav.nav-second-level
+                ul#parent-list.nav.nav-second-level(style='background-color:#ffffff;')
                   li
-                    a#resourcecentricviewops(href='#') Resource-centric View
+                    a#resourcecentricviewops(href='#', style='background-color:#ffffff;') Resource-centric View
                   li
-                    a#flowcentricviewops(href='#') Flow-centric View
+                    a#flowcentricviewops(href='#', style='background-color:#ffffff;') Flow-centric View
                   li
-                    a#servicecentricviewops(href='#') Service-centric View
+                    a#servicecentricviewops(href='#', style='background-color:#ffffff;') Service-centric View
               li
-                a(href='login')
+                a(href='login', style='background-color:#ffe6e6;color:#ff0000;')
                   i.fa.fa-sign-out.fa-fw
-                  |  Logout
-      #page-wrapper
+                  b Logout
+      #page-wrapper(style='width: 1210px;')
         .container-fluid
           .row
             .col-lg-12
               // h1.page-header
-        .row
+        .row(style='width: 1180px;')
           .col-lg-12
             .panel.panel-default
-              #panel-heading-id.panel-heading Resource-centric Topological View
+              #panel-heading-id.panel-heading(style='background-color:#003399;text-align:center')
+                b
+                  p(style='display:inline;font-size:12;color:#e6eeff;text-align:center;') Onion-ring-style Visualization
               .panel-body
                 p
-                  iframe#topoIframe(src='http://210.125.84.69:3006/resourcecentricviewops', width='1560', height='600')
-        .row
+                  iframe#topoIframe(src='http://210.125.84.69:3006/onionringviewops', width='1120', height='800')
+        .row(style='width: 1180px;')
           .col-lg-12
             .panel.panel-default
-              .panel-heading Metrics Visualization Panel
+              .panel-heading(style='background-color:#003399;text-align:center')
+                b
+                  p(style='display:inline;font-size:12;color:#e6eeff;text-align:center;') Metrics Visualization Panel
               .panel-body
                 p
-                  iframe#grafanaIframe(src='', width='1560', height='500')
+                  iframe#grafanaIframe(src='', width='1120', height='500')
     // jQuery
     script(src='../bower_components/jquery/dist/jquery.min.js')
     // Bootstrap Core JavaScript
@@ -209,4 +229,3 @@ html(lang='en')
     script(src='../bower_components/metisMenu/dist/metisMenu.min.js')
     // Custom Theme JavaScript
     script(src='../dist/js/sb-admin-2.js')
-

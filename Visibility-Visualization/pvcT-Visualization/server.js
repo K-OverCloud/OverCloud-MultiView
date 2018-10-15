@@ -28,6 +28,34 @@ app.configure('production', function(){
 });
 
 //Define Application Routes
+//the dictionary key is user name and value is
+var userwithip = null;
+var username = "admin";
+
+app.get('/onionringviewops', function(req, res){
+	var data = null;
+	console.log(username);
+	resourceProvider.getDataMultiSliceVisibility(username, function(error, databj)
+	{
+		data = databj;
+		showView();
+	});
+	
+	resourceProvider.getControllerList(function(error, controllerobj)
+    {
+        controllerList = controllerobj;
+        console.log(controllerList);
+        showView();
+    });
+	
+	function showView()
+	{
+		if(data !== null && controllerList !== null){
+			res.render('onionringviewops.jade', {title: 'Onion-ring-based Visualization', data : JSON.stringify(data), controllerList : JSON.stringify(controllerList)});
+		}
+	}
+});
+
 //MultiView Data Integration & View Access
 var resourceProvider = new ResourceProvider();
 app.get('/resourcecentricviewops', function(req, res){
@@ -37,6 +65,7 @@ app.get('/resourcecentricviewops', function(req, res){
     var serviceList     = 0;
     var ovsBridgeStatus = null;
     var pPathStatus     = null;
+	var controllerList  = null;
     resourceProvider.getpBoxList( function(error, boxobj)
     {
 		boxList = boxobj;
@@ -54,29 +83,22 @@ app.get('/resourcecentricviewops', function(req, res){
         showView();
     })
 
-    /*resourceProvider.getServiceList(function(error, serviceobj)
-    {
-        serviceList = serviceobj;
-        console.log(serviceList);
-        showView();
-    })*/
-
-    /*resourceProvider.getpPathStatus(function(error, pathobj)
-    {
-        pPathStatus = pathobj;
-        console.log(pPathStatus);
-        showView();
-    })*/
-
     resourceProvider.getovsBridgeStatus(function(error, bridgestatusobj)
     {
         ovsBridgeStatus = bridgestatusobj;
         showView();
     })
+	
+	resourceProvider.getControllerList(function(error, controllerobj)
+    {
+        controllerList = controllerobj;
+        console.log(controllerList);
+        showView();
+	});
 
     function showView()
     {
-        if(boxList !== null && switchList !== null && instanceList !== null && serviceList !==null &&  ovsBridgeStatus !== null)
+        if(boxList !== null && switchList !== null && instanceList !== null && controllerList !==null && ovsBridgeStatus !== null)
 		{
         	console.log('Resource-Centric View Rendering');
 			console.log( boxList);
@@ -84,7 +106,7 @@ app.get('/resourcecentricviewops', function(req, res){
 			console.log(instanceList);
 			console.log(ovsBridgeStatus);
             
-			res.render('resourcecentricviewops.jade', {boxList: JSON.stringify(boxList), switchList: JSON.stringify(switchList), instanceList: JSON.stringify(instanceList), serviceList: JSON.stringify(serviceList), ovsBridgeStatus: JSON.stringify(ovsBridgeStatus)});			
+			res.render('resourcecentricviewops.jade', {boxList: JSON.stringify(boxList), switchList: JSON.stringify(switchList), instanceList: JSON.stringify(instanceList), serviceList: JSON.stringify(serviceList), ovsBridgeStatus: JSON.stringify(ovsBridgeStatus), controllerList: JSON.stringify(controllerList)});			
     		/*res.render('resourcecentricviewops.jade',{locals: {
                 boxList     : JSON.stringify(boxList),
 				switchList      : JSON.stringify(switchList),

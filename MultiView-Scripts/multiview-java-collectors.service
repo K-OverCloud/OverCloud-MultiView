@@ -1,0 +1,17 @@
+[Unit]
+Description=Multi-View Java-based Collectors
+After=network.target
+After=network-online.target
+
+[Service]
+User=root
+WorkingDirectory=/home/visibility/OverCloud-MultiView/MultiView-RunnableJars
+ExecStart=/home/visibility/OverCloud-MultiView/MultiView-RunnableJars/start-multiview-java-collectors
+SuccessExitStatus=143
+StandardOutput=null
+StandardError=null
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

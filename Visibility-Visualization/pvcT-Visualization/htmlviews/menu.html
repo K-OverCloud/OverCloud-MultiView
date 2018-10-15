@@ -30,20 +30,36 @@
     <script type="text/javascript" src="javascripts/boxes.json"></script>
     <link href="stylesheets/vis.css" rel="stylesheet" type="text/css">
     <script type="text/javascript">
-      //redirect to login page if user is not logged
-      var session_username = sessionStorage.getItem('ss_user_name');
-      var session_userrole = sessionStorage.getItem('ss_role');
+		var serverIP="210.125.84.69";
+		var serverPort="3006";
+		//redirect to login page if user is not logged
+		var session_username = sessionStorage.getItem('ss_user_name');
+		var session_userrole = sessionStorage.getItem('ss_role');
       
-      if(session_username === null){
-        window.location.replace("http://210.125.84.69:3006");
-      }
+		if(session_username === null){
+			window.location.replace("http://"+serverIP+":"+serverPort+"/login");
+		}
 	  
 	  //Resource-level Functions Start
       //receive Box objects
-      function receiveValueBox(boxs){
+	  function receiveValueBox(boxs){
         var iframe = document.getElementById('grafanaIframe');
-        console.log(boxs);
-        iframe.src = 'http://210.125.84.69:3000/dashboard/db/resource-dashboard-'+boxs.label;
+        if (boxs.label == 'SaaS-Box1')
+		{
+			iframe.src = 'http://210.125.84.69:3000/d/NM5hqr0mk/resource-dashboard-'+boxs.label+'?refresh=10s&orgId=1';
+		}
+		else if (boxs.label == 'SaaS-Box2')
+		{
+			iframe.src = 'http://210.125.84.69:3000/d/s7Orw3Aik/resource-dashboard-saas-box2?refresh=10s&orgId=1&theme=light';
+		}
+		else if (boxs.label == 'SaaS-Box3')
+		{
+			iframe.src = 'http://210.125.84.69:3000/d/LdCrQq0iz/resource-dashboard-saas-box3?refresh=10s&orgId=1&theme=light';
+		}	
+		else if (boxs.label == 'SaaS-Box4')
+		{
+			iframe.src = 'http://210.125.84.69:3000/d/f2KCQ3Aik/resource-dashboard-saas-box4?refresh=10s&orgId=1&theme=light';
+		}
       }
       //receive brCap Objects
       function receiveValueBrCap(brCaps){
@@ -87,6 +103,38 @@
 	  }
 	  //Flow-level Functions End
 	  
+	  //Route to Onion-ring Multi-View for tenant
+	  function getOnionRingTenant(vlan){
+		var iframe = document.getElementById('topoIframe');
+		iframe.src = 'http://210.125.84.69:3006/onionringviewtenant/'+vlan;
+	  }
+	  
+		//receive objects from psd3
+		function receiveTenantID(data){
+			//- console.log("Receive Data Success " + data.info);
+			var iframe = document.getElementById('grafanaIframe');
+			//iframe.src = 'http://http://210.125.84.69:3006/dashboard/db/resource-dashboard-'+data.boxID;
+			if (data.label == 'SaaS-Box1')
+			{
+				iframe.src = 'http://210.125.84.69:3000/d/NM5hqr0mk/resource-dashboard-'+data.label+'?refresh=10s&orgId=1&theme=light';
+			}
+			else if (data.label == 'SaaS-Box2')
+			{
+				iframe.src = 'http://210.125.84.69:3000/d/s7Orw3Aik/resource-dashboard-saas-box2?refresh=10s&orgId=1&theme=light';
+			}
+			else if (data.label == 'SaaS-Box3')
+			{
+				iframe.src = 'http://210.125.84.69:3000/d/LdCrQq0iz/resource-dashboard-saas-box3?refresh=10s&orgId=1&theme=light';
+			}	
+			else if (data.label == 'SaaS-Box4')
+			{
+				iframe.src = 'http://210.125.84.69:3000/d/f2KCQ3Aik/resource-dashboard-saas-box4?refresh=10s&orgId=1&theme=light';
+			}
+			else if (data.label == 'SF')
+			{
+				iframe.src = 'http://210.125.84.69:8008/app/dashboard-example/html/';
+			}
+		}
       //Show Panel on Click
       function showPanel(itemID){
         var iframe = document.getElementById('topoIframe');
@@ -95,107 +143,89 @@
       }
       // Called when the Visualization API is loaded.
       function draw() {
-      document.getElementById('text').innerHTML="Logged as "+session_userrole;
+		document.getElementById('usertext').innerHTML="Logged In User:  "+session_username;
       
-      //Update********************************************************
-      var resource = document.getElementById('resourcecentricviewops');
-      var flow = document.getElementById('flowcentricviewops');
-      var service = document.getElementById('servicecentricviewops');
-	    var iframe = document.getElementById('topoIframe');
-      resource.addEventListener('click', function() { 
-        document.getElementById('panel-heading-id').innerHTML = 'Resource-Centric Topological View';
-        iframe.src = 'http://210.125.84.69:3006/resourcecentricviewops';
-        });
-      flow.addEventListener('click', function() { 
-        document.getElementById('panel-heading-id').innerHTML = 'Flow-Centric Topological View';
-        iframe.src = 'http://210.125.84.69:3006/flowcentricviewops';
-        });
-      service.addEventListener('click', function() { 
-        document.getElementById('panel-heading-id').innerHTML = 'Service-Centric Topological View';
-        iframe.src = 'http://210.125.84.69:3006/servicecentricviewops';
-        });
-        //**************************************************************
-      // Create a data table with nodes.
+		//Update********************************************************
+		var resource = document.getElementById('resourcecentricviewops');
+		var flow = document.getElementById('flowcentricviewops');
+		var service = document.getElementById('servicecentricviewops');
+		var iframe = document.getElementById('topoIframe');
+		  
+		/*resourcecentricviewops.addEventListener('click', function() {
+			document.getElementById('panel-heading-id').innerHTML = '<b><p style="display:inline;font-size:12;color:#e6eeff;text-align:center;">Onion-ring-based Visualization (Operator)</p></b>';
+			iframe1.src = 'http://210.125.84.69:3006/onionringviewops';
+		});*/
+				
+		resource.addEventListener('click', function() { 
+			document.getElementById('panel-heading-id').innerHTML = '<b><p style="display:inline;font-size:12;color:#e6eeff;text-align:center;">Onion-ring-based Visualization (Operator)</p></b>';
+			iframe.src = 'http://210.125.84.69:3006/onionringviewops';
+		});
+		flow.addEventListener('click', function() { 
+			document.getElementById('panel-heading-id').innerHTML = 'Flow-Centric Topological View';
+			//iframe.src = 'http://210.125.84.69:3006/flowcentricviewops';
+		});
+		service.addEventListener('click', function() { 
+			document.getElementById('panel-heading-id').innerHTML = 'Service-Centric Topological View';
+			//iframe.src = 'http://210.125.84.69:3006/servicecentricviewops';
+		});
+		//**************************************************************
+		// Create a data table with nodes.
       }
     </script>
   </head>
-  <body onload="draw()">
-    <div id="wrapper">
-      <!-- Navigation-->
-      <nav role="navigation" style="margin-bottom: 0" class="navbar navbar-default navbar-static-top">
-        <div class="navbar-header">
-          <button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-          <p>
-            <div id="text"></div>
-          </p>
-        </div>
-        <ul class="nav navbar-top-links navbar-right">
-          <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i></a>
-            <ul class="dropdown-menu dropdown-messages"></ul>
-          </li>
-          <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-tasks fa-fw"></i><i class="fa fa-caret-down"></i></a>
-            <ul class="dropdown-menu dropdown-tasks"></ul>
-          </li>
-          <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-bell fa-fw"></i><i class="fa fa-caret-down"></i></a>
-            <ul class="dropdown-menu dropdown-alerts"></ul>
-          </li>
-          <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i></a>
-            <ul class="dropdown-menu dropdown-user">
-              <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
-              <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a></li>
-              <li class="divider"></li>
-              <li><a href="login"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
-            </ul>
-          </li>
-        </ul>
-        <div role="navigation" class="navbar-default sidebar">
-          <div class="sidebar-nav navbar-collapse">
-            <ul id="side-menu" class="nav">
-              <li class="sidebar-search">
-                <div class="input-group custom-search-form">
-                  <input type="text" placeholder="Search..." class="form-control"><span class="input-group-btn">
-                    <button type="button" class="btn btn-default"><i class="fa fa-search"></i></button></span>
-                </div>
-              </li>
-              <li><a href="#"><i class="fa fa-bookmark fa-fw"></i> Multiview<span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level" id="parent-list">
-                  <li ><a id="resourcecentricviewops" href="#">Resource-centric View</a></li>
-                  <li ><a id="flowcentricviewops" href="#">Flow-centric View</a></li>
-                  <li ><a id="servicecentricviewops" href="#">Service-centric View</a></li>
-                </ul>
-              </li>
-              <li><a href="login"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
-            </ul>
-          </div>
-        </div>
+	<body onload="draw()">
+		<div id="wrapper" style="width: 1430px;">
+			<!-- Navigation-->
+			<nav role="navigation" style="margin-bottom: 0" class="navbar navbar-default navbar-static-top">
+				<div class="navbar-header" style="background-color:#e0e0d1;width: 1460px; height: 50px; display:inline-block">
+					<button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+					<p><div id="titlediv"><b><h1 style="color:#ff8000;font-family:verdana;text-align:center;display:inline;">SmartX Multi-View Dashboard</h1></b></div></p>
+				</div>
+			
+				<div role="navigation" class="navbar-default sidebar">
+					<div class="sidebar-nav navbar-collapse">
+						<ul id="side-menu" class="nav">
+						<li class="sidebar-search" style="background-color:#e0e0d1;font-size:12;color:#737373;text-align:center;width: 250px; height: 40px;">
+								<div class="input-group custom-search-form" id="usertext"></div>
+						</li>
+						<li><a href="#" style="background-color:#eaeae1;color:#3c3c2a;"><i class="fa fa-bookmark fa-fw"></i>SmartX Multi-View<span class="fa arrow"></span></a>
+								<ul id="parent-list" class="nav nav-second-level" style="background-color:#ffffff;">
+									<li><a id="resourcecentricviewops" href="#" style="background-color:#ffffff;">Resource-centric View</a></li>
+									<li><a id="flowcentricviewops" href="#" style="background-color:#ffffff;">Flow-centric View</a></li>
+									<li><a id="servicecentricviewops" href="#" style="background-color:#ffffff;">Service-centric View</a></li>
+								</ul>
+						</li>
+						
+						<li><a href="login" style="background-color:#ffe6e6;color:#ff0000;"><i class="fa fa-sign-out fa-fw"></i> <b>Logout</b></a></li>
+					</ul>
+					</div>
+				</div>
       </nav>
-      <div id="page-wrapper">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-lg-12">
-              <!--h1.page-header-->
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="panel panel-default">
-              <div class="panel-heading" id="panel-heading-id">Resource-centric Topological View</div>
-              <div class="panel-body">
-                <p>
-                  <iframe id="topoIframe" src="http://210.125.84.69:3006/resourcecentricviewops" width="1560" height="600"></iframe>
-                </p>
+      <div id="page-wrapper" style="width: 1210px;">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-12">
+							<!-- h1.page-header-->
+						</div>
+					</div>
+				</div>
+				<div class="row" style="width: 1180px;">
+					<div class="col-lg-12">
+						<div class="panel panel-default">
+							<div id="panel-heading-id" class="panel-heading" style="background-color:#003399;text-align:center"><b><p style="display:inline;font-size:12;color:#e6eeff;text-align:center;">Onion-ring-style Visualization</p></b></div>
+								<div class="panel-body">
+									<p><iframe id="topoIframe" src="http://210.125.84.69:3006/onionringviewops" width="1120" height="800"></iframe></p>
               </div>
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row" style="width: 1180px;">
           <div class="col-lg-12">
             <div class="panel panel-default">
-              <div class="panel-heading">Metrics Visualization Panel</div>
+              <div class="panel-heading" style="background-color:#003399;text-align:center"><b><p style="display:inline;font-size:12;color:#e6eeff;text-align:center;">Metrics Visualization Panel</p></b></div>
               <div class="panel-body">
                 <p>
-                  <iframe id="grafanaIframe" src="" width="1560" height="500"></iframe>
+                  <iframe id="grafanaIframe" src="" width="1120" height="500"></iframe>
                 </p>
               </div>
             </div>

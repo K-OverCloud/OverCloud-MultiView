@@ -1,0 +1,16 @@
+[Unit]
+Description=sFlow-RT Collector
+After=network.target
+After=network-online.target
+
+[Service]
+User=root
+ExecStart=/home/visibility/OverCloud-MultiView/Visibility-Collection-Validation/Collectors/sflow-rt/start.sh
+SuccessExitStatus=143
+StandardOutput=null
+StandardError=null
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
